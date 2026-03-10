@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SyntasK — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #E2001A;
+  --red-d: #b50015;
+  --red-bg: #fff2f3;
+  --navy: #0E2841;
+  --white: #fff;
+  --off: #f8f9fb;
+  --muted: #7a8a99;
+  --border: #eaeef2;
+  --green: #00b87a;
+  --amber: #f5a623;
+  --blue: #2d7dd2;
+  --purple: #7c5cbf;
+  --sh: 0 2px 12px rgba(0,0,0,0.07);
+  --sh2: 0 8px 28px rgba(0,0,0,0.11);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Raleway',sans-serif;background:var(--off);color:var(--navy);min-height:100vh;overflow-x:hidden;}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  height:60px;
+  background:linear-gradient(100deg,#E2001A 0%,#c8001a 60%,#a0000f 100%);
+  display:flex;align-items:center;padding:0 20px;gap:16px;
+  box-shadow:0 3px 20px rgba(226,0,26,0.35);
+}
+.logo-pill{
+  background:white;border-radius:10px;padding:4px 10px;
+  display:flex;align-items:center;height:44px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.12);
+}
+.logo-pill img{height:34px;width:auto;display:block;}
+.tb-space{flex:1;}
+.view-toggle{
+  display:flex;background:rgba(0,0,0,0.18);
+  border-radius:10px;padding:3px;gap:2px;
+}
+.vbtn{
+  padding:6px 16px;border-radius:8px;border:none;
+  background:transparent;color:rgba(255,255,255,0.6);
+  font-family:'Raleway',sans-serif;font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .22s;white-space:nowrap;
+}
+.vbtn.active{background:white;color:var(--red);}
+.user-chip{
+  display:flex;align-items:center;gap:9px;
+  background:rgba(0,0,0,0.15);border-radius:26px;
+  padding:5px 14px 5px 6px;
+}
+.uavatar{
+  width:32px;height:32px;border-radius:50%;
+  background:white;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:900;color:var(--red);
+}
+.uname{font-size:12px;font-weight:800;color:white;line-height:1.2;}
+.urole{font-size:10px;color:rgba(255,255,255,0.6);line-height:1.2;}
+
+/* ── LAYOUT ── */
+.layout{display:flex;margin-top:60px;min-height:calc(100vh - 60px);}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:210px;flex-shrink:0;
+  position:fixed;top:60px;left:0;bottom:0;
+  overflow-y:auto;
+  /* KEY: white sidebar so icons are always visible */
+  background:white;
+  border-right:1px solid var(--border);
+  padding:12px 0 24px;
+  box-shadow:2px 0 12px rgba(0,0,0,0.06);
+}
+.nav-section{
+  font-size:9px;font-weight:700;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--muted);
+  padding:16px 18px 6px;
+}
+.nitem{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 16px;margin:1px 8px;
+  color:#4a5568;font-size:13px;font-weight:600;
+  cursor:pointer;border-radius:10px;
+  transition:all .18s;border-left:3px solid transparent;
+  position:relative;
+}
+.nitem:hover{background:#fff2f3;color:var(--red);}
+.nitem.active{
+  background:linear-gradient(90deg,#fff0f1,#fff8f8);
+  color:var(--red);font-weight:800;
+  border-left-color:var(--red);
+}
+.nicon{font-size:17px;width:22px;text-align:center;flex-shrink:0;}
+.nbadge{
+  margin-left:auto;background:var(--red);color:white;
+  font-size:9px;font-weight:800;padding:2px 6px;
+  border-radius:8px;min-width:18px;text-align:center;
+}
+.nbadge.amber{background:var(--amber);}
+.npulse{
+  width:7px;height:7px;border-radius:50%;background:var(--red);
+  margin-left:auto;animation:pulse 2s infinite;flex-shrink:0;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.75);}}
+
+/* ── MAIN ── */
+.main{margin-left:210px;flex:1;padding:24px;min-height:calc(100vh - 60px);}
+.panel{display:none;animation:fin .28s ease;}
+.panel.active{display:block;}
+@keyframes fin{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── HEADERS ── */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;}
+.ptitle{font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--navy);}
+.psub{font-size:12px;color:var(--muted);margin-top:3px;}
+
+/* ── CARD ── */
+.card{background:white;border-radius:16px;padding:20px;box-shadow:var(--sh);border:1px solid var(--border);}
+.ctitle{font-size:13px;font-weight:800;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.cicon{width:28px;height:28px;background:var(--red-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+
+/* ── KPI ── */
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.kcard{background:white;border-radius:16px;padding:18px;box-shadow:var(--sh);border:1px solid var(--border);position:relative;overflow:hidden;}
+.kcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ka,var(--red));}
+.klabel{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.kval{font-size:30px;font-weight:900;color:var(--navy);letter-spacing:-1px;line-height:1;}
+.kdelta{margin-top:5px;font-size:11px;font-weight:600;}
+.kdelta.up{color:var(--green);}.kdelta.dn{color:var(--red);}.kdelta.nu{color:var(--muted);}
+
+/* ── 2-COL ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px;}
+.g3{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:22px;}
+
+/* ── CLIENT ROWS ── */
+.crow{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;background:var(--off);transition:all .16s;cursor:pointer;border:1px solid transparent;margin-bottom:8px;}
+.crow:hover{border-color:#ffd0d4;background:white;box-shadow:var(--sh);}
+.cavatar{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white;flex-shrink:0;}
+.cname{font-size:13px;font-weight:700;color:var(--navy);}
+.csec{font-size:11px;color:var(--muted);}
+.cinfo{flex:1;}
+.cbadge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:14px;}
+.cb-green{background:rgba(0,184,122,.12);color:var(--green);}
+.cb-red{background:rgba(226,0,26,.1);color:var(--red);}
+.cb-gray{background:rgba(120,140,160,.1);color:var(--muted);}
+
+/* ── ALERTS ── */
+.aitem{display:flex;gap:11px;padding:12px;border-radius:11px;background:var(--off);border-left:4px solid;margin-bottom:9px;}
+.aitem.h{border-color:var(--red);}.aitem.m{border-color:var(--amber);}.aitem.l{border-color:var(--blue);}
+.atitle{font-size:12px;font-weight:700;color:var(--navy);}
+.adesc{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4;}
+.atime{font-size:10px;color:var(--muted);margin-top:3px;font-family:'DM Mono',monospace;}
+
+/* ── CHAT ── */
+.chat-wrap{display:grid;grid-template-columns:250px 1fr;height:520px;}
+.clist{background:white;border-right:1px solid var(--border);overflow-y:auto;border-radius:16px 0 0 16px;}
+.clist-hdr{padding:13px 15px;border-bottom:1px solid var(--border);font-size:13px;font-weight:800;color:var(--navy);}
+.citem{display:flex;align-items:center;gap:9px;padding:11px 14px;cursor:pointer;transition:background .14s;border-bottom:1px solid var(--off);}
+.citem:hover{background:var(--off);}
+.citem.active{background:#fff2f3;}
+.cavt{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0;}
+.cname2{font-size:12px;font-weight:700;color:var(--navy);}
+.cprev{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}
+.ctime{font-size:10px;color:var(--muted);margin-left:auto;align-self:flex-start;flex-shrink:0;}
+.cunread{background:var(--green);color:white;font-size:9px;font-weight:800;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-left:auto;flex-shrink:0;}
+.cwin{display:flex;flex-direction:column;border-radius:0 16px 16px 0;overflow:hidden;background:#ece5dd;}
+.cwin-hdr{background:#075E54;padding:10px 15px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.cwname{font-size:13px;font-weight:700;color:white;}
+.cwsub{font-size:10px;color:rgba(255,255,255,.6);}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:7px;}
+.mdate{align-self:center;font-size:10px;color:#777;background:rgba(255,255,255,.7);padding:2px 9px;border-radius:7px;margin:3px 0;}
+.msg{max-width:74%;padding:7px 11px;border-radius:9px;font-size:12px;line-height:1.5;}
+.msg.in{background:white;align-self:flex-start;border-top-left-radius:2px;color:#111;}
+.msg.out{background:#dcf8c6;align-self:flex-end;border-top-right-radius:2px;color:#111;}
+.msender{font-size:10px;font-weight:700;color:var(--red);margin-bottom:2px;}
+.mtime{font-size:9px;color:rgba(0,0,0,.32);text-align:right;margin-top:2px;}
+.cinput-bar{background:#f0f0f0;padding:9px 13px;display:flex;gap:9px;align-items:center;flex-shrink:0;}
+.cinput{flex:1;border:none;border-radius:18px;padding:8px 15px;font-family:'Raleway',sans-serif;font-size:12px;outline:none;color:var(--navy);}
+.csend{width:34px;height:34px;background:#075E54;border:none;border-radius:50%;color:white;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.csend:hover{background:#054d44;}
+
+/* ── CV ── */
+.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;}
+.ftag{padding:5px 13px;border-radius:18px;border:1.5px solid var(--border);font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .18s;background:white;}
+.ftag.active,.ftag:hover{border-color:var(--red);color:var(--red);background:var(--red-bg);}
+.cvgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.cvcard{background:white;border-radius:13px;padding:15px;border:1.5px solid var(--border);transition:all .18s;cursor:pointer;}
+.cvcard:hover{border-color:var(--red);box-shadow:var(--sh);transform:translateY(-2px);}
+.cvtop{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+.cvav{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:white;}
+.cvname{font-size:12px;font-weight:800;color:var(--navy);}
+.cvrole{font-size:10px;color:var(--muted);}
+.cvtags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px;}
+.cvtag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;background:var(--off);color:var(--muted);}
+.cvmatch{display:flex;align-items:center;justify-content:space-between;padding:7px 9px;background:var(--off);border-radius:7px;}
+.cvml{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.cvms{font-size:14px;font-weight:900;color:var(--green);}
+.cvbar{height:3px;background:var(--border);border-radius:2px;margin-top:4px;overflow:hidden;position:relative;}
+.cvfill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--green),#00d88a);border-radius:2px;}
+
+/* ── CALENDAR ── */
+.callayout{display:grid;grid-template-columns:1fr 300px;gap:18px;}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.caldl{text-align:center;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;padding:5px 0;}
+.cald{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer;transition:all .14s;position:relative;color:var(--navy);}
+.cald:hover{background:var(--red-bg);}
+.cald.om{color:var(--border);}
+.cald.today{background:var(--red);color:white;font-weight:800;}
+.cald.ev::after{content:'';position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--red);}
+.cald.today::after{background:white;}
+.ditem{display:flex;gap:10px;align-items:flex-start;padding:11px;background:var(--off);border-radius:11px;cursor:pointer;border:1px solid transparent;margin-bottom:8px;transition:all .15s;}
+.ditem:hover{border-color:var(--red);background:white;}
+.ddate{display:flex;flex-direction:column;align-items:center;background:var(--red);color:white;border-radius:9px;padding:5px 9px;min-width:40px;flex-shrink:0;}
+.dday{font-size:17px;font-weight:900;line-height:1;}
+.dmon{font-size:8px;text-transform:uppercase;letter-spacing:.8px;opacity:.8;}
+.dtitle{font-size:12px;font-weight:700;color:var(--navy);}
+.ddesc{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4;}
+.urg{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;margin-left:auto;flex-shrink:0;}
+.urg.h{background:rgba(226,0,26,.1);color:var(--red);}
+.urg.m{background:rgba(245,166,35,.12);color:var(--amber);}
+.urg.l{background:rgba(45,125,210,.1);color:var(--blue);}
+
+/* ── DOCS ── */
+.drow{display:flex;align-items:center;gap:11px;padding:11px;background:var(--off);border-radius:11px;cursor:pointer;border:1px solid transparent;margin-bottom:8px;transition:all .15s;}
+.drow:hover{border-color:var(--red);background:white;}
+.dicon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+
+/* ── FORMAZIONE ── */
+.fcgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:20px;}
+.fccard{background:white;border-radius:14px;padding:18px;border:1.5px solid var(--border);cursor:pointer;transition:all .18s;}
+.fccard:hover{border-color:var(--red);transform:translateY(-2px);box-shadow:var(--sh);}
+.fcicon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;}
+.fctitle{font-size:13px;font-weight:800;color:var(--navy);margin-bottom:3px;}
+.fcdesc{font-size:11px;color:var(--muted);line-height:1.5;}
+.fccta{margin-top:10px;font-size:10px;font-weight:700;color:var(--red);}
+
+/* ── HRed ── */
+.hgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.hcard{background:white;border-radius:16px;padding:22px;box-shadow:var(--sh);border:1px solid var(--border);}
+.hhdr{display:flex;align-items:center;gap:11px;margin-bottom:12px;}
+.hicon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.htitle{font-size:15px;font-weight:900;color:var(--navy);letter-spacing:-.3px;}
+.hsub{font-size:10px;color:var(--muted);margin-top:2px;}
+.hdesc{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:12px;}
+
+/* ── SERVICE GRID (azienda hero) ── */
+.hero-az{
+  background:linear-gradient(130deg,var(--red) 0%,#a0000f 100%);
+  border-radius:18px;padding:28px;margin-bottom:22px;
+  color:white;position:relative;overflow:hidden;
+}
+.hero-az::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;background:rgba(255,255,255,.07);border-radius:50%;}
+.hero-az::after{content:'';position:absolute;bottom:-40px;left:35%;width:140px;height:140px;background:rgba(0,0,0,.06);border-radius:50%;}
+.hz-welcome{font-size:11px;color:rgba(255,255,255,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;}
+.hz-name{font-size:26px;font-weight:900;letter-spacing:-1px;margin-bottom:3px;}
+.hz-tag{font-size:13px;color:rgba(255,255,255,.65);}
+.hz-stats{display:flex;gap:24px;margin-top:20px;position:relative;z-index:1;}
+.hz-sv{font-size:24px;font-weight:900;color:white;line-height:1;}
+.hz-sl{font-size:9px;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:22px;}
+.scard{background:white;border-radius:14px;padding:18px;border:1.5px solid var(--border);cursor:pointer;transition:all .18s;box-shadow:var(--sh);}
+.scard:hover{border-color:var(--red);transform:translateY(-2px);box-shadow:var(--sh2);}
+.sicon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;}
+.stitle{font-size:13px;font-weight:800;color:var(--navy);margin-bottom:3px;}
+.sdesc{font-size:11px;color:var(--muted);line-height:1.5;}
+.scta{margin-top:10px;font-size:10px;font-weight:700;color:var(--red);}
+
+/* ── BUTTONS ── */
+.btn{background:var(--red);color:white;border:none;border-radius:10px;padding:9px 18px;font-family:'Raleway',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:background .18s;}
+.btn:hover{background:var(--red-d);}
+.btn-ghost{background:white;color:var(--red);border:1.5px solid var(--red);border-radius:10px;padding:8px 16px;font-family:'Raleway',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+.btn-blue{background:var(--blue);color:white;border:none;border-radius:10px;padding:9px 18px;font-family:'Raleway',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+.btn-green{background:var(--green);color:white;border:none;border-radius:10px;padding:9px 18px;font-family:'Raleway',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:white;border-radius:20px;padding:28px;width:460px;max-width:92vw;box-shadow:0 24px 64px rgba(0,0,0,.18);transform:translateY(18px);transition:transform .22s;}
+.overlay.open .modal{transform:translateY(0);}
+.mtitle{font-size:17px;font-weight:900;color:var(--navy);margin-bottom:5px;}
+.msub{font-size:12px;color:var(--muted);margin-bottom:18px;}
+.mclose{float:right;background:none;border:none;font-size:19px;cursor:pointer;color:var(--muted);margin-top:-3px;}
+.mbox{background:var(--red-bg);border-radius:11px;padding:13px;border-left:3px solid var(--red);}
+.mbox-label{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px;}
+.mbox-text{font-size:12px;color:var(--navy);line-height:1.6;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:rgba(226,0,26,.18);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo-pill"><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QCMRXhpZgAATU0AKgAAAAgABQESAAMAAAABAAEAAAEaAAUAAAABAAAASgEbAAUAAAABAAAAUgEoAAMAAAABAAIAAIdpAAQAAAABAAAAWgAAAAAAAABIAAAAAQAAAEgAAAABAAOgAQADAAAAAf//AACgAgAEAAAAAQAAAUmgAwAEAAAAAQAAAOUAAAAA/+0AOFBob3Rvc2hvcCAzLjAAOEJJTQQEAAAAAAAAOEJJTQQlAAAAAAAQ1B2M2Y8AsgTpgAmY7PhCfv/iAihJQ0NfUFJPRklMRQABAQAAAhhhcHBsBAAAAG1udHJSR0IgWFlaIAfmAAEAAQAAAAAAAGFjc3BBUFBMAAAAAEFQUEwAAAAAAAAAAAAAAAAAAAAAAAD21gABAAAAANMtYXBwbAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACmRlc2MAAAD8AAAAMGNwcnQAAAEsAAAAUHd0cHQAAAF8AAAAFHJYWVoAAAGQAAAAFGdYWVoAAAGkAAAAFGJYWVoAAAG4AAAAFHJUUkMAAAHMAAAAIGNoYWQAAAHsAAAALGJUUkMAAAHMAAAAIGdUUkMAAAHMAAAAIG1sdWMAAAAAAAAAAQAAAAxlblVTAAAAFAAAABwARABpAHMAcABsAGEAeQAgAFAAM21sdWMAAAAAAAAAAQAAAAxlblVTAAAANAAAABwAQwBvAHAAeQByAGkAZwBoAHQAIABBAHAAcABsAGUAIABJAG4AYwAuACwAIAAyADAAMgAyWFlaIAAAAAAAAPbVAAEAAAAA0yxYWVogAAAAAAAAg98AAD2/////u1hZWiAAAAAAAABKvwAAsTcAAAq5WFlaIAAAAAAAACg4AAARCwAAyLlwYXJhAAAAAAADAAAAAmZmAADypwAADVkAABPQAAAKW3NmMzIAAAAAAAEMQgAABd7///MmAAAHkwAA/ZD///ui///9owAAA9wAAMBu/8AAEQgA5QFJAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/bAEMAAQEBAQEBAgEBAgMCAgIDBQMDAwMFBgUFBQUFBgcGBgYGBgYHBwcHBwcHBwgICAgICAoKCgoKCwsLCwsLCwsLC//bAEMBAgICAwMDBQMDBQwIBggMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDP/dAAQAFf/aAAwDAQACEQMRAD8A/v4ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/0P7+KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9H+/iiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKwLnxBoVheJpt9fW8NzJ9yKSRQ5+gJyaAN+iiigAooooAKKKKACiiigAooooAKKKKAP//S/v4ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAPxU/wCC6n7fvjT9gP8AYubxb8KXWHxh4u1JNB0u4YA/Zt8cks1yFPUoke1PR3Q1/KD+yZ/wRs/4KR/8FF/ha/7XmpePG0pP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S/8ACsPiH/ab3/ghGRbPzNUgeCVy4+dmjQjyz14Gc4rwWP8A4N79B1r4U2XwN+I3xt8X634S8NXS3HhjS38lbewxJ5hPl42yOwLJuboGOBX9HtFLlQH4w/tPf8EqPiV+0H428RahoHx/8ZeFfC/jCCO11nw5amOS0kjWFIHSMP8AcEiJ845p/wAaf+CL3wC8f/CP4beBvhZr2r/D/wARfCO1Fp4c8TaTIBeRp1dZSeH3uWc9MFjjqa/ZuijlQH4ZeOP+CM9x8ZP2eNU+D/x6+NXi/wAZeIrvWbXXbLxFfuhlsri0BEYgi+4E55Hrg12HwL/4JD2Hwv8A2n/CX7X/AMRviv4o8f8AjbwzZzWTz6yY3jmilTYiAAfu0iB4CdTya/Z2ijlQBRRRTAKKKKACiiigD//T/v4ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/1P7+KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9X+/iiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP/Z" alt="SyntasK"></div>
+  <div class="tb-space"></div>
+  <div class="view-toggle">
+    <button class="vbtn active" onclick="switchView('comm',this)">👔 Vista Commerciale</button>
+    <button class="vbtn" onclick="switchView('az',this)">🏭 Vista Azienda</button>
+  </div>
+  <div class="user-chip">
+    <div class="uavatar" id="uav">AI</div>
+    <div>
+      <div class="uname" id="uname">Andrea Immè</div>
+      <div class="urole" id="urole">Commerciale · Poggibonsi</div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- SIDEBAR — white bg so icons always visible -->
+<nav class="sidebar" id="sidebar">
+  <!-- COMMERCIALE NAV (shown when comm view) -->
+  <div id="nav-comm">
+    <div class="nav-section">Principale</div>
+    <div class="nitem active" onclick="showPanel('overview')"><span class="nicon">📊</span> Overview</div>
+    <div class="nitem" onclick="showPanel('chat')"><span class="nicon">💬</span> Messaggi <span class="nbadge">3</span></div>
+    <div class="nitem" onclick="showPanel('cv')"><span class="nicon">👥</span> Banca CV</div>
+    <div class="nitem" onclick="showPanel('calendar')"><span class="nicon">📅</span> Scadenze <span class="nbadge amber">2</span></div>
+    <div class="nav-section">Servizi</div>
+    <div class="nitem" onclick="showPanel('documenti')"><span class="nicon">📁</span> Documenti</div>
+    <div class="nitem" onclick="showPanel('formazione')"><span class="nicon">🎓</span> Formazione</div>
+    <div class="nitem" onclick="showPanel('hred')"><span class="nicon">🧠</span> HRed</div>
+    <div class="nav-section">Clienti</div>
+    <div class="nitem" onclick="showPanel('overview')"><span class="nicon">🏢</span> Portafoglio</div>
+    <div class="nitem" onclick="showPanel('overview')"><span class="nicon">🔔</span> Alert <span class="npulse"></span></div>
+    <div class="nav-section">Sistema</div>
+    <div class="nitem"><span class="nicon">⚙️</span> Impostazioni</div>
+  </div>
+
+  <!-- AZIENDA NAV (shown when azienda view) -->
+  <div id="nav-az" style="display:none">
+    <div class="nav-section">Il mio spazio</div>
+    <div class="nitem active" onclick="showPanel('az-home')"><span class="nicon">🏠</span> Home</div>
+    <div class="nitem" onclick="showPanel('az-chat')"><span class="nicon">💬</span> Messaggi <span class="npulse"></span></div>
+    <div class="nitem" onclick="showPanel('az-cv')"><span class="nicon">👥</span> Banca CV</div>
+    <div class="nitem" onclick="showPanel('az-doc')"><span class="nicon">📁</span> Documenti</div>
+    <div class="nitem" onclick="showPanel('az-form')"><span class="nicon">🎓</span> Formazione</div>
+    <div class="nitem" onclick="showPanel('az-hred')"><span class="nicon">🧠</span> HRed</div>
+    <div class="nitem" onclick="showPanel('az-calendar')"><span class="nicon">📅</span> Scadenze</div>
+    <div class="nav-section">Supporto</div>
+    <div class="nitem" onclick="showPanel('az-chat')"><span class="nicon">🎯</span> Il mio consulente</div>
+    <div class="nitem" onclick="showPanel('az-report')"><span class="nicon">📊</span> Report azienda</div>
+    <div class="nitem"><span class="nicon">⚙️</span> Impostazioni</div>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- ═══ COMMERCIALE PANELS ═══ -->
+
+<!-- OVERVIEW -->
+<div class="panel active" id="panel-overview">
+  <div class="ph">
+    <div><div class="ptitle">Buongiorno, Andrea 👋</div><div class="psub">Lunedì 10 marzo 2025 · Poggibonsi · 7 alert attivi</div></div>
+    <button class="btn" onclick="openModal()">+ Nuovo messaggio</button>
+  </div>
+  <div class="kgrid">
+    <div class="kcard" style="--ka:var(--red)"><div class="klabel">Clienti attivi</div><div class="kval">82</div><div class="kdelta up">↑ +5 questo mese</div></div>
+    <div class="kcard" style="--ka:var(--amber)"><div class="klabel">Alert da gestire</div><div class="kval">7</div><div class="kdelta dn">↑ 2 urgenti oggi</div></div>
+    <div class="kcard" style="--ka:var(--green)"><div class="klabel">Messaggi inviati</div><div class="kval">128</div><div class="kdelta up">↑ 89% risposta</div></div>
+    <div class="kcard" style="--ka:var(--blue)"><div class="klabel">Riattivazioni</div><div class="kval">11</div><div class="kdelta nu">→ target: 20%</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle"><div class="cicon">🏢</div> Clienti prioritari</div>
+      <div class="crow" onclick="showPanel('chat')"><div class="cavatar" style="background:linear-gradient(135deg,#3a8eba,#1a5a7a)">M</div><div class="cinfo"><div class="cname">Mario Bianchi</div><div class="csec">Metalmeccanico · Poggibonsi</div></div><span class="cbadge cb-red">⚡ Bando attivo</span></div>
+      <div class="crow"><div class="cavatar" style="background:linear-gradient(135deg,#2d7dd2,#1a4a8a)">F</div><div class="cinfo"><div class="cname">Fratelli Rossi Srl</div><div class="csec">Logistica · Arezzo</div></div><span class="cbadge cb-green">✓ Attivo</span></div>
+      <div class="crow"><div class="cavatar" style="background:linear-gradient(135deg,#9b59b6,#6c3483)">T</div><div class="cinfo"><div class="cname">Tecnoarredo Spa</div><div class="csec">Arredo · Firenze</div></div><span class="cbadge cb-gray">❄ Inattivo</span></div>
+      <div class="crow"><div class="cavatar" style="background:linear-gradient(135deg,#e67e22,#a04000)">G</div><div class="cinfo"><div class="cname">GreenPack Italia</div><div class="csec">Packaging · Siena</div></div><span class="cbadge cb-green">✓ Attivo</span></div>
+      <div class="crow" onclick="openModal()"><div class="cavatar" style="background:linear-gradient(135deg,#e2001a,#900010)">L</div><div class="cinfo"><div class="cname">Lavorazioni Valdelsa</div><div class="csec">Manifattura · Colle Val d'Elsa</div></div><span class="cbadge cb-red">⚡ Follow-up</span></div>
+    </div>
+    <div class="card">
+      <div class="ctitle"><div class="cicon">🔔</div> Alert predittivi SyntasK</div>
+      <div class="aitem h" onclick="showPanel('chat')" style="cursor:pointer"><div style="font-size:19px;flex-shrink:0">🎯</div><div><div class="atitle">Bando formazione metalmeccanici</div><div class="adesc">Mario Bianchi idoneo. Scade 30 marzo. Contattare subito.</div><div class="atime">Oggi · 08:14</div></div></div>
+      <div class="aitem m"><div style="font-size:19px;flex-shrink:0">📋</div><div><div class="atitle">Contratto in scadenza</div><div class="adesc">Tecnoarredo Spa — 3 lavoratori. Rinnovo entro 15 apr.</div><div class="atime">Ieri · 16:32</div></div></div>
+      <div class="aitem l"><div style="font-size:19px;flex-shrink:0">💡</div><div><div class="atitle">Opportunità cross-selling</div><div class="adesc">GreenPack Italia — servizi HRed non attivati.</div><div class="atime">2 giorni fa</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT COMMERCIALE -->
+<div class="panel" id="panel-chat">
+  <div class="ph"><div><div class="ptitle">Messaggi WhatsApp</div><div class="psub">3 conversazioni con risposta pendente</div></div></div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div class="chat-wrap">
+      <div class="clist" id="comm-clist"><div class="clist-hdr">Conversazioni</div></div>
+      <div class="cwin">
+        <div class="cwin-hdr">
+          <div class="cavt" id="cwav" style="background:linear-gradient(135deg,#3a8eba,#1a5a7a);width:32px;height:32px;font-size:12px;">M</div>
+          <div><div class="cwname" id="cwname">Mario Bianchi</div><div class="cwsub" id="cwsub">online · Metalmeccanico · Poggibonsi</div></div>
+        </div>
+        <div class="msgs" id="comm-msgs"></div>
+        <div class="cinput-bar">
+          <input class="cinput" id="comm-input" placeholder="Scrivi un messaggio..." onkeydown="if(event.key==='Enter')sendMsg('comm')">
+          <button class="csend" onclick="sendMsg('comm')">➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BANCA CV -->
+<div class="panel" id="panel-cv">
+  <div class="ph"><div><div class="ptitle">Banca CV · SynAi</div><div class="psub">1.247 profili · Matching predittivo attivo</div></div><input style="border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;font-family:'Raleway',sans-serif;font-size:12px;outline:none;width:200px;" placeholder="🔍 Cerca..."></div>
+  <div class="card" style="margin-bottom:18px;"><div class="filters"><div class="ftag active">Tutti</div><div class="ftag">Operaio metalmeccanico</div><div class="ftag">Magazziniere</div><div class="ftag">Impiegato</div><div class="ftag">Autista C</div><div class="ftag">Saldatore</div><div class="ftag">Disp. immediata</div></div></div>
+  <div class="cvgrid">
+    <div class="cvcard"><div class="cvtop"><div class="cvav" style="background:linear-gradient(135deg,#3a8eba,#1a5a7a)">LM</div><div><div class="cvname">Luca Martini</div><div class="cvrole">Operaio metalmeccanico · 8a</div></div></div><div class="cvtags"><span class="cvtag">CNC</span><span class="cvtag">Saldatura MIG</span><span class="cvtag">Pat. B</span></div><div class="cvmatch"><div><div class="cvml">Match SynAi</div><div class="cvbar"><div class="cvfill" style="width:92%"></div></div></div><div class="cvms">92%</div></div></div>
+    <div class="cvcard"><div class="cvtop"><div class="cvav" style="background:linear-gradient(135deg,#e67e22,#a04000)">SR</div><div><div class="cvname">Sara Russo</div><div class="cvrole">Magazziniera · 5a</div></div></div><div class="cvtags"><span class="cvtag">Muletto</span><span class="cvtag">WMS</span><span class="cvtag">Disp. immediata</span></div><div class="cvmatch"><div><div class="cvml">Match SynAi</div><div class="cvbar"><div class="cvfill" style="width:87%"></div></div></div><div class="cvms">87%</div></div></div>
+    <div class="cvcard"><div class="cvtop"><div class="cvav" style="background:linear-gradient(135deg,#9b59b6,#6c3483)">GP</div><div><div class="cvname">Giorgio Pellegrini</div><div class="cvrole">Saldatore · 12a</div></div></div><div class="cvtags"><span class="cvtag">TIG/MIG</span><span class="cvtag">Inox</span><span class="cvtag">Poggibonsi</span></div><div class="cvmatch"><div><div class="cvml">Match SynAi</div><div class="cvbar"><div class="cvfill" style="width:84%"></div></div></div><div class="cvms">84%</div></div></div>
+    <div class="cvcard"><div class="cvtop"><div class="cvav" style="background:linear-gradient(135deg,#27ae60,#145a32)">AM</div><div><div class="cvname">Anna Moretti</div><div class="cvrole">Impiegata HR · 6a</div></div></div><div class="cvtags"><span class="cvtag">Paghe</span><span class="cvtag">Zucchetti</span><span class="cvtag">Part-time</span></div><div class="cvmatch"><div><div class="cvml">Match SynAi</div><div class="cvbar"><div class="cvfill" style="width:79%"></div></div></div><div class="cvms">79%</div></div></div>
+    <div class="cvcard"><div class="cvtop"><div class="cvav" style="background:linear-gradient(135deg,#e2001a,#900010)">RF</div><div><div class="cvname">Roberto Ferretti</div><div class="cvrole">Autista C+E · 15a</div></div></div><div class="cvtags"><span class="cvtag">C+E</span><span class="cvtag">ADR</span><span class="cvtag">Nazionale</span></div><div class="cvmatch"><div><div class="cvml">Match SynAi</div><div class="cvbar"><div class="cvfill" style="width:76%"></div></div></div><div class="cvms">76%</div></div></div>
+    <div class="cvcard"><div class="cvtop"><div class="cvav" style="background:linear-gradient(135deg,#2d7dd2,#1a4a8a)">FC</div><div><div class="cvname">Federica Conti</div><div class="cvrole">Contabile · 4a</div></div></div><div class="cvtags"><span class="cvtag">SAP</span><span class="cvtag">Prima nota</span><span class="cvtag">Disp. immediata</span></div><div class="cvmatch"><div><div class="cvml">Match SynAi</div><div class="cvbar"><div class="cvfill" style="width:71%"></div></div></div><div class="cvms">71%</div></div></div>
+  </div>
+</div>
+
+<!-- SCADENZE -->
+<div class="panel" id="panel-calendar">
+  <div class="ph"><div><div class="ptitle">Scadenze e Bandi</div><div class="psub">Marzo 2025 · 5 scadenze critiche</div></div></div>
+  <div class="callayout">
+    <div class="card">
+      <div class="ctitle"><div class="cicon">📅</div> Marzo 2025</div>
+      <div class="calgrid">
+        <div class="caldl">L</div><div class="caldl">M</div><div class="caldl">M</div><div class="caldl">G</div><div class="caldl">V</div><div class="caldl">S</div><div class="caldl">D</div>
+        <div class="cald om">24</div><div class="cald om">25</div><div class="cald om">26</div><div class="cald om">27</div><div class="cald om">28</div><div class="cald om">1</div><div class="cald om">2</div>
+        <div class="cald">3</div><div class="cald">4</div><div class="cald">5</div><div class="cald">6</div><div class="cald ev">7</div><div class="cald">8</div><div class="cald">9</div>
+        <div class="cald today">10</div><div class="cald">11</div><div class="cald ev">12</div><div class="cald ev">13</div><div class="cald">14</div><div class="cald">15</div><div class="cald">16</div>
+        <div class="cald">17</div><div class="cald">18</div><div class="cald ev">19</div><div class="cald">20</div><div class="cald">21</div><div class="cald">22</div><div class="cald">23</div>
+        <div class="cald">24</div><div class="cald">25</div><div class="cald">26</div><div class="cald">27</div><div class="cald">28</div><div class="cald ev">29</div><div class="cald ev">30</div><div class="cald">31</div>
+      </div>
+    </div>
+    <div class="card" style="padding:14px">
+      <div class="ctitle"><div class="cicon">⚡</div> Scadenze critiche</div>
+      <div class="ditem"><div class="ddate"><div class="dday">30</div><div class="dmon">Mar</div></div><div style="flex:1"><div class="dtitle">Bando Formazione Metalmeccanici</div><div class="ddesc">Mario Bianchi idoneo. Da inviare.</div></div><span class="urg h">Urgente</span></div>
+      <div class="ditem"><div class="ddate" style="background:var(--amber)"><div class="dday">15</div><div class="dmon">Apr</div></div><div style="flex:1"><div class="dtitle">Rinnovo contratti Tecnoarredo</div><div class="ddesc">3 lavoratori in scadenza.</div></div><span class="urg m">Medio</span></div>
+      <div class="ditem"><div class="ddate" style="background:var(--blue)"><div class="dday">19</div><div class="dmon">Mar</div></div><div style="flex:1"><div class="dtitle">Fondo Interprofessionale</div><div class="ddesc">GreenPack Italia — candidatura.</div></div><span class="urg l">Pianificato</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- DOCUMENTI -->
+<div class="panel" id="panel-documenti">
+  <div class="ph"><div><div class="ptitle">Modulo Documentale</div><div class="psub">Report, buste paga, contratti e contrattualistica rapida</div></div><button class="btn" onclick="openModal('doc')">⚡ Contratto rapido</button></div>
+  <div class="kgrid">
+    <div class="kcard" style="--ka:var(--red)"><div class="klabel">Documenti totali</div><div class="kval">214</div><div class="kdelta nu">18 questo mese</div></div>
+    <div class="kcard" style="--ka:var(--amber)"><div class="klabel">In scadenza</div><div class="kval">6</div><div class="kdelta dn">2 urgenti</div></div>
+    <div class="kcard" style="--ka:var(--green)"><div class="klabel">Contratti attivi</div><div class="kval">38</div><div class="kdelta up">+4 nuovi</div></div>
+    <div class="kcard" style="--ka:var(--blue)"><div class="klabel">Report generati</div><div class="kval">12</div><div class="kdelta nu">marzo 2025</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle"><div class="cicon">📄</div> Documenti recenti</div>
+      <div class="drow"><div class="dicon" style="background:rgba(226,0,26,.1)">📊</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--navy)">Report mensile filiale — Marzo 2025</div><div style="font-size:10px;color:var(--muted)">SyntasK · 8 mar</div></div><span style="font-size:10px;font-weight:700;background:rgba(0,184,122,.12);color:var(--green);padding:2px 8px;border-radius:12px">PDF</span></div>
+      <div class="drow"><div class="dicon" style="background:rgba(45,125,210,.1)">💰</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--navy)">Analisi buste paga — Fratelli Rossi Srl</div><div style="font-size:10px;color:var(--muted)">Feb 2025 · 12 cedolini</div></div><span style="font-size:10px;font-weight:700;background:rgba(45,125,210,.1);color:var(--blue);padding:2px 8px;border-radius:12px">XLSX</span></div>
+      <div class="drow"><div class="dicon" style="background:rgba(155,89,182,.1)">📋</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--navy)">Contratto — Tecnoarredo Spa</div><div style="font-size:10px;color:var(--muted)">Scad. 15 apr · 3 lavoratori</div></div><span style="font-size:10px;font-weight:700;background:rgba(245,166,35,.12);color:var(--amber);padding:2px 8px;border-radius:12px">⚠ Scade</span></div>
+      <div class="drow"><div class="dicon" style="background:rgba(0,184,122,.1)">✅</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--navy)">Contratto formazione — Bianchi Metalli</div><div style="font-size:10px;color:var(--muted)">Firmato · 7 mar</div></div><span style="font-size:10px;font-weight:700;background:rgba(0,184,122,.12);color:var(--green);padding:2px 8px;border-radius:12px">✓ Firmato</span></div>
+      <div class="drow"><div class="dicon" style="background:rgba(226,0,26,.1)">📊</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--navy)">Analisi costo del lavoro — GreenPack Q1</div><div style="font-size:10px;color:var(--muted)">SyntasK · gen-mar 2025</div></div><span style="font-size:10px;font-weight:700;background:rgba(0,184,122,.12);color:var(--green);padding:2px 8px;border-radius:12px">PDF</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card">
+        <div class="ctitle"><div class="cicon">⚡</div> Contratto Rapido</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px">Genera contratto precompilato con i dati del cliente.</div>
+        <select style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:8px 10px;font-family:'Raleway',sans-serif;font-size:11px;outline:none;margin-bottom:7px;background:white;color:var(--navy)"><option>Seleziona cliente…</option><option>Mario Bianchi</option><option>Fratelli Rossi Srl</option><option>GreenPack Italia</option></select>
+        <select style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:8px 10px;font-family:'Raleway',sans-serif;font-size:11px;outline:none;margin-bottom:10px;background:white;color:var(--navy)"><option>Tipo contratto…</option><option>Somministrazione T.Det.</option><option>Somministrazione T.Ind.</option><option>Apprendistato</option></select>
+        <button class="btn" style="width:100%" onclick="openModal('doc')">⚡ Genera contratto</button>
+      </div>
+      <div class="card">
+        <div class="ctitle"><div class="cicon">💰</div> Costo del lavoro</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;align-items:center;gap:7px"><span style="font-size:11px;font-weight:600;color:var(--navy);width:100px;flex-shrink:0">Fratelli Rossi</span><div style="flex:1;height:7px;background:var(--off);border-radius:4px;overflow:hidden"><div style="height:100%;width:78%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:4px"></div></div><span style="font-size:10px;font-weight:700;color:var(--navy);width:44px;text-align:right">€18.4k</span></div>
+          <div style="display:flex;align-items:center;gap:7px"><span style="font-size:11px;font-weight:600;color:var(--navy);width:100px;flex-shrink:0">GreenPack</span><div style="flex:1;height:7px;background:var(--off);border-radius:4px;overflow:hidden"><div style="height:100%;width:55%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:4px"></div></div><span style="font-size:10px;font-weight:700;color:var(--navy);width:44px;text-align:right">€12.1k</span></div>
+          <div style="display:flex;align-items:center;gap:7px"><span style="font-size:11px;font-weight:600;color:var(--navy);width:100px;flex-shrink:0">Tecnoarredo</span><div style="flex:1;height:7px;background:var(--off);border-radius:4px;overflow:hidden"><div style="height:100%;width:42%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:4px"></div></div><span style="font-size:10px;font-weight:700;color:var(--navy);width:44px;text-align:right">€9.3k</span></div>
+          <div style="display:flex;align-items:center;gap:7px"><span style="font-size:11px;font-weight:600;color:var(--navy);width:100px;flex-shrink:0">Bianchi Metalli</span><div style="flex:1;height:7px;background:var(--off);border-radius:4px;overflow:hidden"><div style="height:100%;width:28%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:4px"></div></div><span style="font-size:10px;font-weight:700;color:var(--navy);width:44px;text-align:right">€6.2k</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FORMAZIONE -->
+<div class="panel" id="panel-formazione">
+  <div class="ph"><div><div class="ptitle">Catalogo Formazione</div><div class="psub">Corsi, bandi attivi e piani formativi</div></div><button class="btn">+ Piano formativo</button></div>
+  <div class="card" style="margin-bottom:18px"><div class="filters" style="margin-bottom:0"><div class="ftag active">Tutti</div><div class="ftag">Sicurezza</div><div class="ftag">Digitale</div><div class="ftag">Manageriale</div><div class="ftag">Tecnico</div><div class="ftag">🔴 Bando attivo</div></div></div>
+  <div class="fcgrid">
+    <div class="fccard" style="border-left:4px solid var(--red)"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><div class="fcicon" style="background:rgba(226,0,26,.1);margin-bottom:0">🏭</div><span style="font-size:9px;font-weight:700;background:rgba(226,0,26,.1);color:var(--red);padding:2px 7px;border-radius:8px;align-self:flex-start">🔴 BANDO ATTIVO</span></div><div class="fctitle">Sicurezza Metalmeccanica</div><div class="fcdesc">D.Lgs 81/08 aggiornamento. Rimborso 70% con Fondimpresa.</div><div style="display:flex;justify-content:space-between;margin-top:8px"><span style="font-size:10px;color:var(--muted)">16 ore · Misto</span><span style="font-size:11px;font-weight:800;color:var(--navy)">€280/pers</span></div><div class="fccta">Attiva per Mario →</div></div>
+    <div class="fccard"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><div class="fcicon" style="background:rgba(45,125,210,.1);margin-bottom:0">💻</div><span style="font-size:9px;font-weight:700;background:rgba(45,125,210,.1);color:var(--blue);padding:2px 7px;border-radius:8px;align-self:flex-start">DIGITALE</span></div><div class="fctitle">Industria 4.0 & Automazione</div><div class="fcdesc">Competenze digitali per operatori manifatturieri. Certificato.</div><div style="display:flex;justify-content:space-between;margin-top:8px"><span style="font-size:10px;color:var(--muted)">24 ore · Online</span><span style="font-size:11px;font-weight:800;color:var(--navy)">€420/pers</span></div><div class="fccta">Vedi programma →</div></div>
+    <div class="fccard"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><div class="fcicon" style="background:rgba(0,184,122,.1);margin-bottom:0">📦</div><span style="font-size:9px;font-weight:700;background:rgba(0,184,122,.12);color:var(--green);padding:2px 7px;border-radius:8px;align-self:flex-start">LOGISTICA</span></div><div class="fctitle">Gestione Magazzino</div><div class="fcdesc">WMS, lean warehouse, gestione scorte.</div><div style="display:flex;justify-content:space-between;margin-top:8px"><span style="font-size:10px;color:var(--muted)">20 ore · Misto</span><span style="font-size:11px;font-weight:800;color:var(--navy)">€350/pers</span></div><div class="fccta">Vedi programma →</div></div>
+    <div class="fccard"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><div class="fcicon" style="background:rgba(124,92,191,.1);margin-bottom:0">🎯</div><span style="font-size:9px;font-weight:700;background:rgba(124,92,191,.1);color:var(--purple);padding:2px 7px;border-radius:8px;align-self:flex-start">MANAGERIALE</span></div><div class="fctitle">Leadership & Team</div><div class="fcdesc">Sviluppo competenze manageriali per responsabili di team.</div><div style="display:flex;justify-content:space-between;margin-top:8px"><span style="font-size:10px;color:var(--muted)">12 ore · Presenza</span><span style="font-size:11px;font-weight:800;color:var(--navy)">€590/pers</span></div><div class="fccta">Vedi programma →</div></div>
+    <div class="fccard"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><div class="fcicon" style="background:rgba(245,166,35,.1);margin-bottom:0">⚖️</div><span style="font-size:9px;font-weight:700;background:rgba(245,166,35,.12);color:var(--amber);padding:2px 7px;border-radius:8px;align-self:flex-start">NORMATIVA</span></div><div class="fctitle">Privacy & GDPR</div><div class="fcdesc">Obbligo normativo. 100% online. Tutto il personale.</div><div style="display:flex;justify-content:space-between;margin-top:8px"><span style="font-size:10px;color:var(--muted)">4 ore · Online</span><span style="font-size:11px;font-weight:800;color:var(--navy)">€90/pers</span></div><div class="fccta">Vedi programma →</div></div>
+    <div class="fccard" style="border:1.5px dashed var(--border);background:var(--off);cursor:default"><div class="fcicon" style="background:rgba(107,126,148,.1);font-size:26px">➕</div><div class="fctitle" style="color:var(--muted)">Corso personalizzato</div><div class="fcdesc">SyntasK progetta piani su misura per la tua azienda.</div><div class="fccta" onclick="showPanel('chat')" style="cursor:pointer">Richiedi ora →</div></div>
+  </div>
+  <div class="card"><div class="ctitle"><div class="cicon">💡</div> Bandi attivi</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px"><div style="background:rgba(226,0,26,.05);border:1.5px solid rgba(226,0,26,.18);border-radius:11px;padding:12px"><div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:5px">FONDIMPRESA</div><div style="font-size:12px;font-weight:800;color:var(--navy);margin-bottom:3px">Piano Formativo Aziendale</div><div style="font-size:10px;color:var(--muted)">Rimborso 70% · Scade 30 mar</div></div><div style="background:rgba(45,125,210,.05);border:1.5px solid rgba(45,125,210,.18);border-radius:11px;padding:12px"><div style="font-size:10px;font-weight:700;color:var(--blue);margin-bottom:5px">FONDO NUOVE COMPETENZE</div><div style="font-size:12px;font-weight:800;color:var(--navy);margin-bottom:3px">Transizione digitale</div><div style="font-size:10px;color:var(--muted)">Fino €2.000/lav · Aperto</div></div><div style="background:rgba(0,184,122,.05);border:1.5px solid rgba(0,184,122,.18);border-radius:11px;padding:12px"><div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:5px">REGIONE TOSCANA</div><div style="font-size:12px;font-weight:800;color:var(--navy);margin-bottom:3px">PMI Toscana Competitiva</div><div style="font-size:10px;color:var(--muted)">Contributo 60% · Scade 19 mar</div></div></div></div>
+</div>
+
+<!-- HRed -->
+<div class="panel" id="panel-hred">
+  <div class="ph"><div><div class="ptitle">HRed — Human Resources Development</div><div class="psub">Strumenti avanzati per sviluppare il capitale umano</div></div><button class="btn">+ Nuovo progetto</button></div>
+  <div class="hgrid">
+    <div class="hcard" style="border-top:4px solid var(--purple)"><div class="hhdr"><div class="hicon" style="background:rgba(124,92,191,.12)">🎯</div><div><div class="htitle">DISC Assessment</div><div class="hsub">Analisi profilo comportamentale</div></div></div><div class="hdesc">Individua i profili <strong>Dominanza, Influenza, Stabilità e Coscienziosità</strong> del tuo team per ottimizzare comunicazione e ruoli.</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:13px"><div style="background:var(--off);border-radius:9px;padding:9px;text-align:center"><div style="font-size:18px;font-weight:900;color:var(--purple)">D</div><div style="font-size:9px;color:var(--muted);font-weight:700">DOMINANZA</div></div><div style="background:var(--off);border-radius:9px;padding:9px;text-align:center"><div style="font-size:18px;font-weight:900;color:var(--red)">I</div><div style="font-size:9px;color:var(--muted);font-weight:700">INFLUENZA</div></div><div style="background:var(--off);border-radius:9px;padding:9px;text-align:center"><div style="font-size:18px;font-weight:900;color:var(--green)">S</div><div style="font-size:9px;color:var(--muted);font-weight:700">STABILITÀ</div></div><div style="background:var(--off);border-radius:9px;padding:9px;text-align:center"><div style="font-size:18px;font-weight:900;color:var(--blue)">C</div><div style="font-size:9px;color:var(--muted);font-weight:700">COSCIENZIOSITÀ</div></div></div><div style="display:flex;gap:7px"><button class="btn" style="flex:1;padding:8px">Avvia sessione</button><button class="btn-ghost" style="padding:8px 13px">Report</button></div></div>
+    <div class="hcard" style="border-top:4px solid var(--red)"><div class="hhdr"><div class="hicon" style="background:rgba(226,0,26,.1)">🏗️</div><div><div class="htitle">HR Design</div><div class="hsub">Progettazione organizzativa</div></div></div><div class="hdesc">Disegna la struttura HR ideale. <strong>Organigrammi, job description, percorsi di carriera</strong> e benchmark retributivi.</div><div style="display:flex;flex-direction:column;gap:6px;margin-bottom:13px"><div style="display:flex;align-items:center;gap:9px;padding:8px 11px;background:var(--off);border-radius:8px"><span>🗂️</span><span style="font-size:11px;font-weight:600;color:var(--navy);flex:1">Organigramma dinamico</span><span style="font-size:9px;color:var(--green);font-weight:700">✓ Attivo</span></div><div style="display:flex;align-items:center;gap:9px;padding:8px 11px;background:var(--off);border-radius:8px"><span>📝</span><span style="font-size:11px;font-weight:600;color:var(--navy);flex:1">Job description builder</span><span style="font-size:9px;color:var(--green);font-weight:700">✓ Attivo</span></div><div style="display:flex;align-items:center;gap:9px;padding:8px 11px;background:var(--off);border-radius:8px"><span>💰</span><span style="font-size:11px;font-weight:600;color:var(--navy);flex:1">Benchmark retributivo</span><span style="font-size:9px;color:var(--muted);font-weight:700">Pro</span></div></div><div style="display:flex;gap:7px"><button class="btn" style="flex:1;padding:8px">Progetta struttura</button><button class="btn-ghost" style="padding:8px 13px">Esempi</button></div></div>
+    <div class="hcard" style="border-top:4px solid var(--blue)"><div class="hhdr"><div class="hicon" style="background:rgba(45,125,210,.1)">📋</div><div><div class="htitle">Assessment Center</div><div class="hsub">Valutazione competenze e potenziale</div></div></div><div class="hdesc">Valuta <strong>hard e soft skills</strong> di candidati e dipendenti con strumenti validati scientificamente.</div><div style="margin-bottom:13px"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px">Assessment attivi</div><div style="display:flex;align-items:center;gap:7px;margin-bottom:5px"><div style="width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0"></div><div style="font-size:11px;color:var(--navy);flex:1">Resp. logistica — Fratelli Rossi</div><div style="font-size:10px;color:var(--muted)">In corso</div></div><div style="display:flex;align-items:center;gap:7px"><div style="width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0"></div><div style="font-size:11px;color:var(--navy);flex:1">HR Manager — Tecnoarredo Spa</div><div style="font-size:10px;color:var(--green)">Completato</div></div></div><div style="display:flex;gap:7px"><button class="btn-blue" style="flex:1;padding:8px">Nuovo assessment</button><button class="btn-ghost" style="padding:8px 13px">Report</button></div></div>
+    <div class="hcard" style="border-top:4px solid var(--green)"><div class="hhdr"><div class="hicon" style="background:rgba(0,184,122,.1)">🌡️</div><div><div class="htitle">Analisi Clima Aziendale</div><div class="hsub">Employee engagement & satisfaction</div></div></div><div class="hdesc">Misura <strong>benessere organizzativo</strong>, engagement e soddisfazione. Survey anonime, benchmark di settore.</div><div style="background:var(--off);border-radius:11px;padding:12px;margin-bottom:13px"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px">Rilevamento Feb 2025</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px"><div style="text-align:center"><div style="font-size:20px;font-weight:900;color:var(--green)">7.8</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase">Engagement</div></div><div style="text-align:center"><div style="font-size:20px;font-weight:900;color:var(--blue)">8.1</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase">Benessere</div></div><div style="text-align:center"><div style="font-size:20px;font-weight:900;color:var(--amber)">6.9</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase">Retention</div></div></div></div><div style="display:flex;gap:7px"><button class="btn-green" style="flex:1;padding:8px">Avvia survey</button><button class="btn-ghost" style="padding:8px 13px">Storico</button></div></div>
+  </div>
+</div>
+
+<!-- ═══ AZIENDA PANELS ═══ -->
+
+<!-- AZ HOME -->
+<div class="panel" id="panel-az-home">
+  <div class="hero-az">
+    <div class="hz-welcome">Benvenuto su SyntasK</div>
+    <div class="hz-name">Ciao, Mario! 👋</div>
+    <div class="hz-tag">Il tuo consulente HR sempre con te — in tasca.</div>
+    <div class="hz-stats">
+      <div><div class="hz-sv">3</div><div class="hz-sl">Servizi attivi</div></div>
+      <div><div class="hz-sv" style="color:rgba(255,255,255,.85)">1</div><div class="hz-sl">Alert per te</div></div>
+      <div><div class="hz-sv">15</div><div class="hz-sl">Dipendenti</div></div>
+    </div>
+  </div>
+  <div style="background:white;border:2px solid rgba(226,0,26,.18);border-radius:14px;padding:15px 18px;margin-bottom:22px;display:flex;align-items:center;gap:13px;cursor:pointer;box-shadow:var(--sh)" onclick="showPanel('az-chat')">
+    <div style="font-size:24px">🎯</div>
+    <div style="flex:1"><div style="font-size:13px;font-weight:800;color:var(--navy)">Bando attivo per la tua azienda</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Formazione operai metalmeccanici — rimborso fino al 70%. Scade il <strong style="color:var(--red)">30 marzo</strong>.</div></div>
+    <div style="background:var(--red);color:white;padding:8px 16px;border-radius:9px;font-size:11px;font-weight:700;white-space:nowrap">Scopri →</div>
+  </div>
+  <div style="font-size:14px;font-weight:800;color:var(--navy);margin-bottom:12px">I tuoi servizi Synergie</div>
+  <div class="sgrid">
+    <div class="scard"><div class="sicon" style="background:rgba(226,0,26,.1)">👷</div><div class="stitle">Somministrazione</div><div class="sdesc">3 lavoratori attivi. Prossimo report: 14 marzo.</div><div class="scta">Gestisci →</div></div>
+    <div class="scard" onclick="showPanel('az-chat')"><div class="sicon" style="background:rgba(0,184,122,.1)">📚</div><div class="stitle">Formazione</div><div class="sdesc">Bando attivo: risparmia fino a €4.200.</div><div class="scta" style="color:var(--green)">Attiva ora →</div></div>
+    <div class="scard" onclick="showPanel('az-cv')"><div class="sicon" style="background:rgba(45,125,210,.1)">👥</div><div class="stitle">Banca CV</div><div class="sdesc">Candidati selezionati per la tua azienda.</div><div class="scta">Esplora →</div></div>
+    <div class="scard" onclick="showPanel('az-doc')"><div class="sicon" style="background:rgba(155,89,182,.1)">📁</div><div class="stitle">Documenti</div><div class="sdesc">Contratti, cedolini e report sempre disponibili.</div><div class="scta">Apri archivio →</div></div>
+    <div class="scard" onclick="showPanel('az-hred')"><div class="sicon" style="background:rgba(124,92,191,.1)">🧠</div><div class="stitle">HRed</div><div class="sdesc">DISC, assessment e analisi clima per il team.</div><div class="scta">Accedi →</div></div>
+    <div class="scard" onclick="showPanel('az-form')"><div class="sicon" style="background:rgba(0,184,122,.1)">🎓</div><div class="stitle">Formazione</div><div class="sdesc">Catalogo corsi e bandi attivi per il tuo settore.</div><div class="scta">Vedi corsi →</div></div>
+    <div class="scard" onclick="showPanel('az-calendar')"><div class="sicon" style="background:rgba(245,166,35,.1)">📅</div><div class="stitle">Scadenze</div><div class="sdesc">Contratti, bandi e adempimenti in scadenza.</div><div class="scta">Controlla →</div></div>
+    <div class="scard" onclick="showPanel('az-chat')"><div class="sicon" style="background:rgba(226,0,26,.1)">💬</div><div class="stitle">Assistente h24</div><div class="sdesc">Domande su buste paga, contratti, normativa? Scrivici.</div><div class="scta">Scrivi ora →</div></div>
+    <div class="scard" onclick="showPanel('az-report')"><div class="sicon" style="background:rgba(14,40,65,.08)">📊</div><div class="stitle">Report azienda</div><div class="sdesc">Andamento costo del lavoro e analisi mensili.</div><div class="scta">Vedi report →</div></div>
+  </div>
+</div>
+
+<!-- AZ CHAT (solo Mario) -->
+<div class="panel" id="panel-az-chat">
+  <div class="ph"><div><div class="ptitle">I tuoi messaggi</div><div class="psub">Conversazione con SyntasK · Synergie</div></div></div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="chat-wrap" style="grid-template-columns:220px 1fr">
+      <div class="clist">
+        <div class="clist-hdr">Conversazioni</div>
+        <div class="citem active">
+          <div class="cavt" style="background:linear-gradient(135deg,var(--red),#a50012);font-size:12px;font-weight:900">Sk</div>
+          <div style="flex:1;min-width:0"><div class="cname2">SyntasK · Synergie</div><div class="cprev">Prenotiamo giovedì 🤝</div></div>
+          <div class="cunread" style="background:var(--red)">1</div>
+        </div>
+      </div>
+      <div class="cwin">
+        <div class="cwin-hdr">
+          <div class="cavt" style="background:linear-gradient(135deg,var(--red),#a50012);width:32px;height:32px;font-size:11px;font-weight:900">Sk</div>
+          <div><div class="cwname">SyntasK · Synergie</div><div class="cwsub">online · Il tuo consulente HR</div></div>
+        </div>
+        <div class="msgs" id="az-msgs">
+          <div class="mdate">Oggi, 9:14</div>
+          <div class="msg in"><div class="msender">SyntasK</div>Buongiorno Mario 👋 Ho visto che nel settore metalmeccanico è attivo un <strong>bando per la formazione operai</strong>. Scade il 30 marzo.<div class="mtime">9:14 ✓✓</div></div>
+          <div class="msg in"><div class="msender">SyntasK</div>Con 15 dipendenti potresti accedere a un rimborso fino al <strong>70% dei costi</strong>. Vuoi un'analisi veloce? 📊<div class="mtime">9:14 ✓✓</div></div>
+          <div class="msg out">Sì, mandami pure. Non sapevo di questo bando 👍<div class="mtime">9:17 ✓✓</div></div>
+          <div class="msg in"><div class="msender">SyntasK</div>Perfetto! 📎 Ho preparato il riepilogo. Il tuo referente <strong>Andrea Immè</strong> è disponibile questa settimana.<div class="mtime">9:18 ✓✓</div></div>
+          <div class="msg out">Ottimo, prenotiamo per giovedì mattina 🤝<div class="mtime">9:21 ✓✓</div></div>
+        </div>
+        <div class="cinput-bar">
+          <input class="cinput" id="az-input" placeholder="Scrivi a SyntasK..." onkeydown="if(event.key==='Enter')sendMsg('az')">
+          <button class="csend" onclick="sendMsg('az')">➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AZ CV -->
+<div class="panel" id="panel-az-cv">
+  <div class="ph"><div><div class="ptitle">Banca CV</div><div class="psub">Candidati selezionati da SynAi per Bianchi Metalli Srl</div></div></div>
+  <div class="cvgrid">
+    <div class="cvcard"><div class="cvtop"><div class="cvav" style="background:linear-gradient(135deg,#3a8eba,#1a5a7a)">LM</div><div><div class="cvname">Luca Martini</div><div class="cvrole">Operaio metalmeccanico · 8a</div></div></div><div class="cvtags"><span class="cvtag">CNC</span><span class="cvtag">Saldatura MIG</span><span class="cvtag">Pat. B</span></div><div class="cvmatch"><div><div class="cvml">Match SynAi</div><div class="cvbar"><div class="cvfill" style="width:92%"></div></div></div><div class="cvms">92%</div></div></div>
+    <div class="cvcard"><div class="cvtop"><div class="cvav" style="background:linear-gradient(135deg,#9b59b6,#6c3483)">GP</div><div><div class="cvname">Giorgio Pellegrini</div><div class="cvrole">Saldatore · 12a</div></div></div><div class="cvtags"><span class="cvtag">TIG/MIG</span><span class="cvtag">Inox</span><span class="cvtag">Poggibonsi</span></div><div class="cvmatch"><div><div class="cvml">Match SynAi</div><div class="cvbar"><div class="cvfill" style="width:84%"></div></div></div><div class="cvms">84%</div></div></div>
+    <div class="cvcard"><div class="cvtop"><div class="cvav" style="background:linear-gradient(135deg,#e2001a,#900010)">RF</div><div><div class="cvname">Roberto Ferretti</div><div class="cvrole">Autista C+E · 15a</div></div></div><div class="cvtags"><span class="cvtag">C+E</span><span class="cvtag">ADR</span><span class="cvtag">Nazionale</span></div><div class="cvmatch"><div><div class="cvml">Match SynAi</div><div class="cvbar"><div class="cvfill" style="width:76%"></div></div></div><div class="cvms">76%</div></div></div>
+  </div>
+</div>
+
+<!-- AZ DOCUMENTI -->
+<div class="panel" id="panel-az-doc">
+  <div class="ph"><div><div class="ptitle">I tuoi documenti</div><div class="psub">Contratti, cedolini e report di Bianchi Metalli Srl</div></div></div>
+  <div class="card">
+    <div class="ctitle"><div class="cicon">📄</div> Documenti disponibili</div>
+    <div class="drow"><div class="dicon" style="background:rgba(0,184,122,.1)">✅</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--navy)">Contratto formazione — Bianchi Metalli</div><div style="font-size:10px;color:var(--muted)">Firmato digitalmente · 7 mar 2025</div></div><button class="btn" style="padding:5px 12px;font-size:10px">Scarica</button></div>
+    <div class="drow"><div class="dicon" style="background:rgba(45,125,210,.1)">💰</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--navy)">Cedolini febbraio 2025</div><div style="font-size:10px;color:var(--muted)">15 dipendenti · Elaborati da Synergie</div></div><button class="btn" style="padding:5px 12px;font-size:10px">Scarica</button></div>
+    <div class="drow"><div class="dicon" style="background:rgba(226,0,26,.1)">📊</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--navy)">Report costo del lavoro Q1 2025</div><div style="font-size:10px;color:var(--muted)">Generato da SyntasK · mar 2025</div></div><button class="btn" style="padding:5px 12px;font-size:10px">Scarica</button></div>
+    <div class="drow"><div class="dicon" style="background:rgba(155,89,182,.1)">📋</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--navy)">Contratto somministrazione attivo</div><div style="font-size:10px;color:var(--muted)">3 lavoratori · In corso</div></div><button class="btn" style="padding:5px 12px;font-size:10px">Visualizza</button></div>
+  </div>
+</div>
+
+<!-- AZ FORMAZIONE -->
+<div class="panel" id="panel-az-form">
+  <div class="ph"><div><div class="ptitle">Formazione</div><div class="psub">Corsi e bandi disponibili per Bianchi Metalli Srl</div></div></div>
+  <div style="background:white;border:2px solid rgba(226,0,26,.18);border-radius:14px;padding:15px 18px;margin-bottom:20px;display:flex;align-items:center;gap:13px;cursor:pointer;box-shadow:var(--sh)" onclick="showPanel('az-chat')">
+    <div style="font-size:22px">🔴</div>
+    <div style="flex:1"><div style="font-size:13px;font-weight:800;color:var(--navy)">Bando attivo — Sicurezza Metalmeccanica</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Rimborso fino al <strong style="color:var(--red)">70%</strong> dei costi con Fondimpresa. Scade <strong style="color:var(--red)">30 marzo</strong>.</div></div>
+    <div style="background:var(--red);color:white;padding:8px 16px;border-radius:9px;font-size:11px;font-weight:700;white-space:nowrap">Attiva →</div>
+  </div>
+  <div class="fcgrid">
+    <div class="fccard" style="border-left:4px solid var(--red)"><div class="fcicon" style="background:rgba(226,0,26,.1)">🏭</div><div class="fctitle">Sicurezza Metalmeccanica</div><div class="fcdesc">D.Lgs 81/08. Fondimpresa rimborsa il 70%.</div><div style="display:flex;justify-content:space-between;margin-top:8px"><span style="font-size:10px;color:var(--muted)">16 ore · Misto</span><span style="font-size:11px;font-weight:800;color:var(--navy)">€280/pers</span></div><div class="fccta">Attiva ora →</div></div>
+    <div class="fccard"><div class="fcicon" style="background:rgba(45,125,210,.1)">💻</div><div class="fctitle">Industria 4.0</div><div class="fcdesc">Competenze digitali per il tuo reparto produzione.</div><div style="display:flex;justify-content:space-between;margin-top:8px"><span style="font-size:10px;color:var(--muted)">24 ore · Online</span><span style="font-size:11px;font-weight:800;color:var(--navy)">€420/pers</span></div><div class="fccta">Scopri →</div></div>
+    <div class="fccard"><div class="fcicon" style="background:rgba(124,92,191,.1)">🎯</div><div class="fctitle">Leadership & Team</div><div class="fcdesc">Per i responsabili di reparto della tua azienda.</div><div style="display:flex;justify-content:space-between;margin-top:8px"><span style="font-size:10px;color:var(--muted)">12 ore · Presenza</span><span style="font-size:11px;font-weight:800;color:var(--navy)">€590/pers</span></div><div class="fccta">Scopri →</div></div>
+  </div>
+</div>
+
+<!-- AZ HRed -->
+<div class="panel" id="panel-az-hred">
+  <div class="ph"><div><div class="ptitle">HRed per Bianchi Metalli</div><div class="psub">Strumenti di sviluppo HR per il tuo team</div></div></div>
+  <div class="hgrid">
+    <div class="hcard" style="border-top:4px solid var(--purple)"><div class="hhdr"><div class="hicon" style="background:rgba(124,92,191,.12)">🎯</div><div><div class="htitle">DISC Assessment</div><div class="hsub">Conosci il tuo team</div></div></div><div class="hdesc">Scopri i profili comportamentali dei tuoi operai e migliora la gestione del team.</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px"><div style="background:var(--off);border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:var(--purple)">D</div><div style="font-size:9px;color:var(--muted);font-weight:700">DOMINANZA</div></div><div style="background:var(--off);border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:var(--red)">I</div><div style="font-size:9px;color:var(--muted);font-weight:700">INFLUENZA</div></div><div style="background:var(--off);border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:var(--green)">S</div><div style="font-size:9px;color:var(--muted);font-weight:700">STABILITÀ</div></div><div style="background:var(--off);border-radius:8px;padding:8px;text-align:center"><div style="font-size:16px;font-weight:900;color:var(--blue)">C</div><div style="font-size:9px;color:var(--muted);font-weight:700">COSCIENZIOSITÀ</div></div></div><button class="btn" style="width:100%;padding:9px">Avvia per il mio team</button></div>
+    <div class="hcard" style="border-top:4px solid var(--green)"><div class="hhdr"><div class="hicon" style="background:rgba(0,184,122,.1)">🌡️</div><div><div class="htitle">Clima Aziendale</div><div class="hsub">Come sta il tuo team?</div></div></div><div class="hdesc">Survey anonime per misurare benessere e soddisfazione dei tuoi dipendenti.</div><div style="background:var(--off);border-radius:10px;padding:12px;margin-bottom:12px"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px"><div style="text-align:center"><div style="font-size:20px;font-weight:900;color:var(--green)">7.8</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase">Engagement</div></div><div style="text-align:center"><div style="font-size:20px;font-weight:900;color:var(--blue)">8.1</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase">Benessere</div></div><div style="text-align:center"><div style="font-size:20px;font-weight:900;color:var(--amber)">6.9</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase">Retention</div></div></div></div><button class="btn-green" style="width:100%;padding:9px">Avvia survey anonima</button></div>
+  </div>
+</div>
+
+<!-- AZ CALENDAR -->
+<div class="panel" id="panel-az-calendar">
+  <div class="ph"><div><div class="ptitle">Le tue scadenze</div><div class="psub">Contratti, bandi e adempimenti per Bianchi Metalli Srl</div></div></div>
+  <div class="card">
+    <div class="ctitle"><div class="cicon">⚡</div> In scadenza</div>
+    <div class="ditem"><div class="ddate"><div class="dday">30</div><div class="dmon">Mar</div></div><div style="flex:1"><div class="dtitle">Bando Formazione Metalmeccanici</div><div class="ddesc">Idoneo per rimborso 70%. Da attivare subito.</div></div><span class="urg h">Urgente</span></div>
+    <div class="ditem"><div class="ddate" style="background:var(--amber)"><div class="dday">15</div><div class="dmon">Apr</div></div><div style="flex:1"><div class="dtitle">Visita medica periodica</div><div class="ddesc">3 operai — obbligo D.Lgs 81/08.</div></div><span class="urg m">Medio</span></div>
+    <div class="ditem"><div class="ddate" style="background:var(--blue)"><div class="dday">30</div><div class="dmon">Apr</div></div><div style="flex:1"><div class="dtitle">Rinnovo RSPP</div><div class="ddesc">Aggiornamento responsabile sicurezza.</div></div><span class="urg l">Pianificato</span></div>
+  </div>
+</div>
+
+<!-- AZ REPORT -->
+<div class="panel" id="panel-az-report">
+  <div class="ph"><div><div class="ptitle">Report Azienda</div><div class="psub">Andamento e analisi per Bianchi Metalli Srl</div></div><button class="btn">Scarica PDF</button></div>
+  <div class="kgrid">
+    <div class="kcard" style="--ka:var(--navy)"><div class="klabel">Dipendenti totali</div><div class="kval">15</div><div class="kdelta nu">→ stabile</div></div>
+    <div class="kcard" style="--ka:var(--green)"><div class="klabel">Costo mensile</div><div class="kval">€6.2k</div><div class="kdelta up">↓ -3% vs feb</div></div>
+    <div class="kcard" style="--ka:var(--amber)"><div class="klabel">Assenteismo</div><div class="kval">2.1%</div><div class="kdelta up">↓ migliorato</div></div>
+    <div class="kcard" style="--ka:var(--blue)"><div class="klabel">Ore straordinario</div><div class="kval">84h</div><div class="kdelta nu">→ feb 2025</div></div>
+  </div>
+  <div class="card">
+    <div class="ctitle"><div class="cicon">📊</div> Costo del lavoro — Andamento 2025</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:600;color:var(--muted);width:40px">Gen</span><div style="flex:1;height:10px;background:var(--off);border-radius:5px;overflow:hidden"><div style="height:100%;width:88%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:5px"></div></div><span style="font-size:11px;font-weight:700;color:var(--navy);width:50px;text-align:right">€6.4k</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:600;color:var(--muted);width:40px">Feb</span><div style="flex:1;height:10px;background:var(--off);border-radius:5px;overflow:hidden"><div style="height:100%;width:92%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:5px"></div></div><span style="font-size:11px;font-weight:700;color:var(--navy);width:50px;text-align:right">€6.4k</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;font-weight:600;color:var(--navy);font-weight:800;width:40px">Mar</span><div style="flex:1;height:10px;background:var(--off);border-radius:5px;overflow:hidden"><div style="height:100%;width:85%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:5px"></div></div><span style="font-size:11px;font-weight:800;color:var(--red);width:50px;text-align:right">€6.2k</span></div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <button class="mclose" onclick="document.getElementById('modal').classList.remove('open')">✕</button>
+    <div class="mtitle" id="mtitle">Nuovo messaggio proattivo</div>
+    <div class="msub" id="msub">SyntasK suggerisce di contattare Lavorazioni Valdelsa per un follow-up.</div>
+    <div class="mbox"><div class="mbox-label">Messaggio suggerito da SyntasK</div><div class="mbox-text" id="mmsg">Buongiorno! Volevamo fare un check sul progetto HR. Il team è disponibile per una call questa settimana.</div></div>
+    <button class="btn" style="margin-top:16px" onclick="document.getElementById('modal').classList.remove('open')">✉️ Invia via WhatsApp</button>
+    <button style="background:none;border:none;color:var(--muted);font-family:'Raleway',sans-serif;font-size:12px;font-weight:600;cursor:pointer;margin-left:12px;margin-top:16px" onclick="document.getElementById('modal').classList.remove('open')">Annulla</button>
+  </div>
+</div>
+
+<script>
+// ─── CHAT DATA ───
+const CHATS = {
+  mario:{name:"Mario Bianchi",status:"online · Metalmeccanico · Poggibonsi",av:"M",bg:"linear-gradient(135deg,#3a8eba,#1a5a7a)",msgs:[
+    {t:"in",s:"SyntasK",tx:"Buongiorno Mario 👋 Nel settore metalmeccanico è attivo un <strong>bando per la formazione operai</strong>. Scade il 30 marzo.",tm:"9:14"},
+    {t:"in",s:"SyntasK",tx:"Con 15 dipendenti potresti accedere a un rimborso fino al <strong>70% dei costi</strong>. Vuoi un'analisi? 📊",tm:"9:14"},
+    {t:"out",tx:"Sì, mandami pure. Non sapevo di questo bando 👍",tm:"9:17"},
+    {t:"in",s:"SyntasK",tx:"Perfetto! 📎 Ho preparato il riepilogo. Il tuo referente <strong>Andrea Immè</strong> è disponibile questa settimana.",tm:"9:18"},
+    {t:"out",tx:"Ottimo, prenotiamo per giovedì mattina 🤝",tm:"9:21"},
+  ]},
+  rossi:{name:"Fratelli Rossi Srl",status:"Logistica · Arezzo",av:"F",bg:"linear-gradient(135deg,#2d7dd2,#1a4a8a)",msgs:[
+    {t:"in",s:"SyntasK",tx:"Buongiorno! Rinnovo contratti il 15 aprile: <strong>3 lavoratori</strong> da confermare. Prepariamo documentazione?",tm:"Ieri"},
+    {t:"out",tx:"Perfetto, grazie mille!",tm:"Ieri"},
+    {t:"in",s:"Andrea Immè",tx:"Ottimo! Le mando la documentazione entro domani.",tm:"Ieri"},
+  ]},
+  tecno:{name:"Tecnoarredo Spa",status:"Arredo · Firenze",av:"T",bg:"linear-gradient(135deg,#9b59b6,#6c3483)",msgs:[
+    {t:"in",s:"SyntasK",tx:"Buongiorno! Abbiamo novità su <strong>ricerca e selezione</strong>. Fissiamo una call?",tm:"Lun"},
+    {t:"out",tx:"Possiamo sentirci questa settimana?",tm:"Lun"},
+  ]},
+  green:{name:"GreenPack Italia",status:"Packaging · Siena",av:"G",bg:"linear-gradient(135deg,#e67e22,#a04000)",msgs:[
+    {t:"in",s:"SyntasK",tx:"Buongiorno! <strong>Credito formativo</strong> tramite Fondo Interprofessionale. Scadenza 19 marzo.",tm:"Ven"},
+    {t:"out",tx:"Ok ricevuto, ci penso.",tm:"Ven"},
+  ]},
+};
+
+let curChat = "mario";
+
+function buildCommContacts(){
+  const el = document.getElementById("comm-clist");
+  el.innerHTML = '<div class="clist-hdr">Conversazioni</div>';
+  const list = [
+    {k:"mario",prev:"Prenotiamo giovedì 🤝",tm:"9:21"},
+    {k:"rossi",prev:"Grazie mille!",tm:"Ieri",u:2},
+    {k:"tecno",prev:"Possiamo sentirci?",tm:"Lun",u:1},
+    {k:"green",prev:"Ok, ci penso.",tm:"Ven"},
+  ];
+  list.forEach(c=>{
+    const d = CHATS[c.k];
+    const div = document.createElement("div");
+    div.className = "citem"+(c.k===curChat?" active":"");
+    div.onclick = ()=>loadChat(c.k,div);
+    div.innerHTML = `<div class="cavt" style="background:${d.bg}">${d.av}</div>
+      <div style="flex:1;min-width:0"><div class="cname2">${d.name}</div><div class="cprev">${c.prev}</div></div>
+      ${c.u?`<div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><div class="ctime">${c.tm}</div><div class="cunread">${c.u}</div></div>`:`<div class="ctime">${c.tm}</div>`}`;
+    el.appendChild(div);
+  });
+}
+
+function loadChat(key, el){
+  curChat = key;
+  document.querySelectorAll(".citem").forEach(c=>c.classList.remove("active"));
+  if(el) el.classList.add("active");
+  const d = CHATS[key];
+  document.getElementById("cwname").textContent = d.name;
+  document.getElementById("cwsub").textContent = d.status;
+  document.getElementById("cwav").textContent = d.av;
+  document.getElementById("cwav").style.background = d.bg;
+  const msgs = document.getElementById("comm-msgs");
+  msgs.innerHTML = '<div class="mdate">Oggi</div>';
+  d.msgs.forEach(m=>{
+    const div = document.createElement("div");
+    div.className = "msg "+m.t;
+    div.innerHTML = (m.s?`<div class="msender">${m.s}</div>`:"")+m.tx+`<div class="mtime">${m.tm}${m.t==="out"?" ✓✓":""}</div>`;
+    msgs.appendChild(div);
+  });
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function sendMsg(ctx){
+  const inp = document.getElementById(ctx+"-input");
+  const text = inp.value.trim(); if(!text) return;
+  const msgs = document.getElementById(ctx+"-msgs");
+  const now = new Date();
+  const tm = now.getHours()+":"+String(now.getMinutes()).padStart(2,"0");
+  const d = document.createElement("div"); d.className="msg out";
+  d.innerHTML = text+`<div class="mtime">${tm} ✓✓</div>`;
+  msgs.appendChild(d); inp.value=""; msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    const r=document.createElement("div"); r.className="msg in";
+    const reply = ctx==="az"
+      ? `<div class="msender">SyntasK</div>Ciao Mario! Ricevuto. Andrea Immè ti contatterà a breve. 🤝`
+      : `<div class="msender">SyntasK</div>Messaggio ricevuto! Ti risponderemo presto. 👍`;
+    r.innerHTML = reply+`<div class="mtime">${tm} ✓✓</div>`;
+    msgs.appendChild(r); msgs.scrollTop=msgs.scrollHeight;
+  },1100);
+}
+
+// ─── NAVIGATION ───
+const PANELS = {
+  overview:"panel-overview", chat:"panel-chat", cv:"panel-cv", calendar:"panel-calendar",
+  documenti:"panel-documenti", formazione:"panel-formazione", hred:"panel-hred",
+  "az-home":"panel-az-home","az-chat":"panel-az-chat","az-cv":"panel-az-cv",
+  "az-doc":"panel-az-doc","az-form":"panel-az-form","az-hred":"panel-az-hred",
+  "az-calendar":"panel-az-calendar","az-report":"panel-az-report"
+};
+
+const NAV_MAP = {
+  overview:"overview", chat:"messaggi", cv:"banca", calendar:"scadenze",
+  documenti:"documenti", formazione:"formazione", hred:"hred",
+  "az-home":"home","az-chat":"messaggi","az-cv":"banca","az-doc":"documenti",
+  "az-form":"formazione","az-hred":"hred","az-calendar":"scadenze","az-report":"report"
+};
+
+function showPanel(name){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nitem").forEach(n=>n.classList.remove("active"));
+  const p = document.getElementById(PANELS[name]);
+  if(p) p.classList.add("active");
+  const lbl = NAV_MAP[name]||"";
+  document.querySelectorAll(".nitem").forEach(n=>{
+    if(n.textContent.trim().toLowerCase().includes(lbl)) n.classList.add("active");
+  });
+  if(name==="chat"){buildCommContacts();setTimeout(()=>loadChat(curChat),40);}
+  // scroll az-msgs to bottom
+  if(name==="az-chat"){setTimeout(()=>{const m=document.getElementById("az-msgs");if(m)m.scrollTop=m.scrollHeight;},100);}
+}
+
+// ─── VIEW SWITCH ───
+function switchView(v, btn){
+  document.querySelectorAll(".vbtn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  const isComm = v==="comm";
+  document.getElementById("uav").textContent = isComm?"AI":"M";
+  document.getElementById("uname").textContent = isComm?"Andrea Immè":"Mario Bianchi";
+  document.getElementById("urole").textContent = isComm?"Commerciale · Poggibonsi":"Titolare · Bianchi Metalli Srl";
+  document.getElementById("nav-comm").style.display = isComm?"":"none";
+  document.getElementById("nav-az").style.display = isComm?"none":"";
+  showPanel(isComm?"overview":"az-home");
+}
+
+// ─── MODAL ───
+function openModal(type){
+  if(type==="doc"){
+    document.getElementById("mtitle").textContent="⚡ Contratto Rapido Generato";
+    document.getElementById("msub").textContent="SyntasK ha precompilato il contratto con i dati del cliente.";
+    document.getElementById("mmsg").textContent="Contratto di somministrazione a tempo determinato — Bianchi Metalli Srl — 1 lavoratore — CCNL Metalmeccanici. Pronto per la firma digitale.";
+  } else {
+    document.getElementById("mtitle").textContent="Nuovo messaggio proattivo";
+    document.getElementById("msub").textContent="SyntasK suggerisce di contattare Lavorazioni Valdelsa per un follow-up.";
+    document.getElementById("mmsg").textContent="Buongiorno! Volevamo fare un check sul progetto HR. Il team è disponibile per una call questa settimana.";
+  }
+  document.getElementById("modal").classList.add("open");
+}
+
+// INIT
+buildCommContacts();
+setTimeout(()=>loadChat("mario"),80);
+</script>
+</body>
+</html>
